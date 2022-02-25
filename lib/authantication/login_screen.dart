@@ -1,13 +1,17 @@
 import 'package:ecommerce_app/authantication/register_screen.dart';
+import 'package:ecommerce_app/firebase_data/firestore_utils.dart';
+import 'package:ecommerce_app/firebase_data/user.dart' as AppUser;
+import 'package:ecommerce_app/provider/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:provider/provider.dart';
+import '../home_screen.dart';
 import '../utils.dart';
 
 class LoginScreen extends StatefulWidget {
-  static final routeName = 'register_screen';
+  static final routeName = 'login_screen';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -19,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   String email = '';
   String password = '';
   var formKey = GlobalKey<FormState>();
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -66,18 +69,46 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 52,
                 ),
-                customTextFormFieldEmail(email),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'Email'),
+                  onChanged: (text) {
+                    email = text;
+                  },
+                  validator: (text) {
+                    if (text == null || text.trim().isEmpty) {
+                      return 'Please enter an email';
+                    }
+                    if (!isValidEmail(email)) {
+                      return 'invalid email';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 52,
                 ),
-                customTextFormFieldPassword(password),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'password'),
+                  onChanged: (text) {
+                    password = text;
+                  },
+                  validator: (text) {
+                    if (text == null || text.trim().isEmpty) {
+                      return 'Please enter a password';
+                    }
+                    if (password.length < 6) {
+                      return 'at least 6 character';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 20,
                 ),
                 Container(
                   alignment: Alignment.topRight,
                   child: Text(
-                    'Forgot Password?',
+                    'Forget Password?',
                     style: Theme.of(context).textTheme.bodyText1!.copyWith(
                           color: Color.fromRGBO(0, 0, 0, 1.0),
                         ),
@@ -91,11 +122,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: MediaQuery.of(context).size.height * 0.05,
                   child: FlatButton(
                     textColor: Colors.white,
-                    child: Text('SIGN IN'),
+                    child: Text('Login'),
                     color: Colors.green,
                     onPressed: () {
                       if (formKey.currentState?.validate() == true) {
                         signInFirebaseAuth();
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomeScreen()));
                       }
                     },
                   ),
@@ -166,6 +201,10 @@ class _LoginScreenState extends State<LoginScreen> {
           .signInWithEmailAndPassword(email: email, password: password);
       if (result.user != null) {
         showMessage(context, 'sucssceflly');
+       var firestoreUser=  await getUserById(result.user!.uid);
+       if(firestoreUser!=null){
+         Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+       }
       }
     } catch (error) {
       showMessage(context, error.toString());
