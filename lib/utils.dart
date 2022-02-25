@@ -33,38 +33,3 @@ String isUserHaveAccount() {
   return RegisterScreen.routeName;
 }
 
-Widget customTextFormFieldEmail(String email) {
-  return TextFormField(
-    decoration: InputDecoration(hintText: 'Email'),
-    onChanged: (text) {
-      email = text;
-    },
-    validator: (text) {
-      if (text == null || text.isEmpty) {
-        return 'Please enter an email';
-      }
-      if (!isValidEmail(email)) {
-        return 'invalid email';
-      }
-      return null;
-    },
-  );
-}
-
-Widget customTextFormFieldPassword(String password) {
-  return TextFormField(
-    decoration: InputDecoration(hintText: 'password'),
-    onChanged: (text) {
-      password = text;
-    },
-    validator: (text) {
-      if (text == null || text.isEmpty) {
-        return 'Please enter a password';
-      }
-      if (password.length < 6) {
-        return 'at least 6 character';
-      }
-      return null;
-    },
-  );
-}

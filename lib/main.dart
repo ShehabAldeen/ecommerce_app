@@ -1,13 +1,18 @@
 import 'package:ecommerce_app/authantication/login_screen.dart';
 import 'package:ecommerce_app/authantication/register_screen.dart';
 import 'package:ecommerce_app/home_screen.dart';
+import 'package:ecommerce_app/provider/auth_provider.dart';
+import 'package:ecommerce_app/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider<AuthProvider>(
+      create: (builContext)=>AuthProvider(),
+      child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,7 +25,7 @@ class MyApp extends StatelessWidget {
         LoginScreen.routeName: (buildContext) => LoginScreen(),
         HomeScreen.routeName: (buildContext) => HomeScreen(),
       },
-      initialRoute: LoginScreen.routeName,
+      initialRoute: isUserHaveAccount(),
     );
   }
 }
