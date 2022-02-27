@@ -1,6 +1,5 @@
 import 'package:ecommerce_app/authantication/register_screen.dart';
 import 'package:ecommerce_app/firebase_data/firestore_utils.dart';
-import 'package:ecommerce_app/firebase_data/user.dart' as AppUser;
 import 'package:ecommerce_app/provider/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String email = '';
   String password = '';
   var formKey = GlobalKey<FormState>();
+  late AuthProvider provider;
   Widget build(BuildContext context) {
+    provider=Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -127,10 +128,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       if (formKey.currentState?.validate() == true) {
                         signInFirebaseAuth();
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomeScreen()));
                       }
                     },
                   ),
@@ -200,14 +197,15 @@ class _LoginScreenState extends State<LoginScreen> {
       var result = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       if (result.user != null) {
-        showMessage(context, 'sucssceflly');
+        showMessage(context, 'Login is successful');
        var firestoreUser=  await getUserById(result.user!.uid);
        if(firestoreUser!=null){
+         provider.updateUser(firestoreUser);
          Navigator.pushReplacementNamed(context, HomeScreen.routeName);
        }
       }
     } catch (error) {
-      showMessage(context, error.toString());
+      showMessage(context, 'This account do not exist');
     }
   }
 }

@@ -20,12 +20,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: MyThemeData.lightThemeData,
+      debugShowCheckedModeBanner: false,
       routes: {
         RegisterScreen.routeName: (buildContext) => RegisterScreen(),
         LoginScreen.routeName: (buildContext) => LoginScreen(),
         HomeScreen.routeName: (buildContext) => HomeScreen(),
       },
-      initialRoute: isUserHaveAccount(),
+      initialRoute: HomeScreen.routeName,
     );
   }
 }
