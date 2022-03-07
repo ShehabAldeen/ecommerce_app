@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import '../home_screen.dart';
+import '../home/home_screen.dart';
 import '../utils.dart';
 
 class LoginScreen extends StatefulWidget {
