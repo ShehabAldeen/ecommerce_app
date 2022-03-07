@@ -1,8 +1,9 @@
 import 'package:ecommerce_app/authantication/login_screen.dart';
 import 'package:ecommerce_app/authantication/register_screen.dart';
-import 'package:ecommerce_app/home_screen.dart';
+import 'package:ecommerce_app/home/home_screen.dart';
+import 'package:ecommerce_app/home/clicked_product_name.dart';
+import 'package:ecommerce_app/home/product_details.dart';
 import 'package:ecommerce_app/provider/auth_provider.dart';
-import 'package:ecommerce_app/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,8 @@ class MyApp extends StatelessWidget {
         RegisterScreen.routeName: (buildContext) => RegisterScreen(),
         LoginScreen.routeName: (buildContext) => LoginScreen(),
         HomeScreen.routeName: (buildContext) => HomeScreen(),
+        ProductDetails.routeName: (buildContext) => ProductDetails(),
+        ClickedCategory.routeName: (buildContext) => ClickedCategory(),
       },
       initialRoute: HomeScreen.routeName,
     );

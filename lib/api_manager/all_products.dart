@@ -54,7 +54,7 @@ final categoryValues = EnumValues({
   "electronics": Category.ELECTRONICS,
   "jewelery": Category.JEWELERY,
   "men's clothing": Category.MEN_S_CLOTHING,
-  "women's clothing": Category.WOMEN_S_CLOTHING
+  "women's clothing": Category.WOMEN_S_CLOTHING,
 });
 
 class Rating {
