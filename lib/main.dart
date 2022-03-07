@@ -16,10 +16,16 @@ void main() async {
       child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       theme: MyThemeData.lightThemeData,
       debugShowCheckedModeBanner: false,
       routes: {
@@ -29,7 +35,7 @@ class MyApp extends StatelessWidget {
         ProductDetails.routeName: (buildContext) => ProductDetails(),
         ClickedCategory.routeName: (buildContext) => ClickedCategory(),
       },
-      initialRoute: HomeScreen.routeName,
+      initialRoute: RegisterScreen.routeName,
     );
   }
 }
