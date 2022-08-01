@@ -140,15 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       '- OR -',
                       style: TextStyle(fontSize: 20),
                     )),
-                InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RegisterScreen()));
-                    },
-                    child: signInButton(
-                        "Sign up with Facebook", Buttons.Facebook)),
                 signInButton("Sign up with Google", Buttons.Google),
               ],
             ),
@@ -169,6 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleSignInAuthentication.idToken,
       );
       await _auth.signInWithCredential(credential);
+      Navigator.push(context, MaterialPageRoute(builder: (_)=>HomeScreen()));
     } on FirebaseAuthException catch (e) {
       print(e.message);
       throw e;
