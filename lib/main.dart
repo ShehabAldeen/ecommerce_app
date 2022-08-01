@@ -12,8 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(ChangeNotifierProvider<AuthProvider>(
-      create: (builContext)=>AuthProvider(),
-      child: MyApp()));
+      create: (builContext) => AuthProvider(), child: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -25,7 +24,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       theme: MyThemeData.lightThemeData,
       debugShowCheckedModeBanner: false,
       routes: {
