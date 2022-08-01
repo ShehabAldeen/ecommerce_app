@@ -1,13 +1,16 @@
 import 'package:ecommerce_app/authantication/register_screen.dart';
+import 'package:ecommerce_app/firebase_data/firestore_utils.dart';
+import 'package:ecommerce_app/provider/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:provider/provider.dart';
+import '../home/home_screen.dart';
 import '../utils.dart';
 
 class LoginScreen extends StatefulWidget {
-  static final routeName = 'register_screen';
+  static final routeName = 'login_screen';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -19,8 +22,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String email = '';
   String password = '';
   var formKey = GlobalKey<FormState>();
-
+  late AuthProvider provider;
   Widget build(BuildContext context) {
+    provider=Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -66,18 +70,46 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 52,
                 ),
-                customTextFormFieldEmail(email),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'Email'),
+                  onChanged: (text) {
+                    email = text;
+                  },
+                  validator: (text) {
+                    if (text == null || text.trim().isEmpty) {
+                      return 'Please enter an email';
+                    }
+                    if (!isValidEmail(email)) {
+                      return 'invalid email';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 52,
                 ),
-                customTextFormFieldPassword(password),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'password'),
+                  onChanged: (text) {
+                    password = text;
+                  },
+                  validator: (text) {
+                    if (text == null || text.trim().isEmpty) {
+                      return 'Please enter a password';
+                    }
+                    if (password.length < 6) {
+                      return 'at least 6 character';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: 20,
                 ),
                 Container(
                   alignment: Alignment.topRight,
                   child: Text(
-                    'Forgot Password?',
+                    'Forget Password?',
                     style: Theme.of(context).textTheme.bodyText1!.copyWith(
                           color: Color.fromRGBO(0, 0, 0, 1.0),
                         ),
@@ -91,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: MediaQuery.of(context).size.height * 0.05,
                   child: FlatButton(
                     textColor: Colors.white,
-                    child: Text('SIGN IN'),
+                    child: Text('Login'),
                     color: Colors.green,
                     onPressed: () {
                       if (formKey.currentState?.validate() == true) {
@@ -108,15 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       '- OR -',
                       style: TextStyle(fontSize: 20),
                     )),
-                InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RegisterScreen()));
-                    },
-                    child: signInButton(
-                        "Sign up with Facebook", Buttons.Facebook)),
                 signInButton("Sign up with Google", Buttons.Google),
               ],
             ),
@@ -137,6 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleSignInAuthentication.idToken,
       );
       await _auth.signInWithCredential(credential);
+      Navigator.push(context, MaterialPageRoute(builder: (_)=>HomeScreen()));
     } on FirebaseAuthException catch (e) {
       print(e.message);
       throw e;
@@ -165,10 +189,15 @@ class _LoginScreenState extends State<LoginScreen> {
       var result = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       if (result.user != null) {
-        showMessage(context, 'sucssceflly');
+        showMessage(context, 'Login is successful');
+       var firestoreUser=  await getUserById(result.user!.uid);
+       if(firestoreUser!=null){
+         provider.updateUser(firestoreUser);
+         Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+       }
       }
     } catch (error) {
-      showMessage(context, error.toString());
+      showMessage(context, 'This account do not exist');
     }
   }
 }

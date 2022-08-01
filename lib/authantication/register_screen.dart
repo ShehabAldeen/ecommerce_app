@@ -1,7 +1,10 @@
 import 'package:ecommerce_app/authantication/login_screen.dart';
+import 'package:ecommerce_app/firebase_data/user.dart' as AppUser;
+import 'package:ecommerce_app/provider/auth_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import '../firebase_data/firestore_utils.dart';
 import '../utils.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -13,13 +16,14 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   var formKey = GlobalKey<FormState>();
-  String name = '';
+  String firstName = '';
 
   String email = '';
 
   String password = '';
-
+  late AuthProvider provider;
   Widget build(BuildContext context) {
+   provider= Provider.of<AuthProvider>(context);
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -51,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   decoration: InputDecoration(hintText: 'Name'),
                   onChanged: (text) {
-                    name = text;
+                    firstName = text;
                   },
                   validator: (text) {
                     if (text == null || text.isEmpty) {
@@ -63,11 +67,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(
                   height: size.height * .05,
                 ),
-                customTextFormFieldEmail(email),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'Email'),
+                  onChanged: (text) {
+                    email = text;
+                  },
+                  validator: (text) {
+                    if (text == null || text.trim().isEmpty) {
+                      return 'Please enter an email';
+                    }
+                    if (!isValidEmail(email)) {
+                      return 'invalid email';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: size.height * .05,
                 ),
-                customTextFormFieldPassword(password),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'password'),
+                  onChanged: (text) {
+                    password = text;
+                  },
+                  validator: (text) {
+                    if (text == null || text.trim().isEmpty) {
+                      return 'Please enter a password';
+                    }
+                    if (password.length < 6) {
+                      return 'at least 6 character';
+                    }
+                    return null;
+                  },
+                ),
                 SizedBox(
                   height: size.height * .05,
                 ),
@@ -81,7 +113,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: () {
                       if (formKey.currentState?.validate() == true) {
                         addUserToFirebaseAuth();
-                        Navigator.pushNamed(context, LoginScreen.routeName);
                       }
                     },
                   ),
@@ -98,8 +129,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       var result = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+    var user = AppUser.User (id: result.user!.uid, firstName:firstName ,
+          password: password, email: email);
       if (result.user != null) {
-        showMessage(context, 'User registered successfully');
+        addUserToFirestore(user).then((value) {
+          provider.updateUser(user);
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        }).onError((error, stackTrace) {
+          showMessage(context, error.toString());
+        });
       }
     } catch (error) {
       showMessage(context, error.toString());
